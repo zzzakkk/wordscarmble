@@ -1,0 +1,61 @@
+---
+title: "Zaks challenge"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+caesar <- function(word, shift) {letters_vec <- tolower(c(LETTERS))
+  n <- length(letters_vec)
+
+  shift <- shift %% n
+  shifted_letters <- c(letters_vec[(shift+1):n], letters_vec[1:shift])
+
+  letter_mapping <- setNames(shifted_letters, letters_vec)
+
+  word_split <- strsplit(tolower(word), "")[[1]]
+  word_shifted <- sapply(word_split, function(letter) {
+    if (letter %in% letters_vec) {
+      return(letter_mapping[letter])} 
+    else {
+      return(letter)}})
+  
+  paste(word_shifted, collapse = "")}
+```
+
+You can add options to executable code like this
+
+```{r}
+caesar("sfzqlov", -23)
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+## Code
+
+```{r}
+message <- read.csv("https://raw.githubusercontent.com/kbodwin/decodeR/master/general/message_encrypted.txt",
+                    stringsAsFactors = FALSE, header = TRUE)$x
+```
+
+```{r}
+first_word <- strsplit(message[1], " ")[[1]][1]
+possible_shifts <- sapply(-25:25, function(shift) caesar(first_word, shift))
+
+correct_shift <- -17
+```
+
+```{r}
+decoded_message <- sapply(strsplit(message, " "), function(words) {
+  sapply(words, function(word) caesar(word, shift = correct_shift))}) |> unlist() |> paste(collapse = " ")
+
+print(decoded_message)
+```
